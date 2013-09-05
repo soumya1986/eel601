@@ -1,0 +1,2 @@
+eclipse.preferences.version=1
+org.eclipse.core.variables.valueVariables=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<valueVariables>\n<valueVariable description\="MulticoreEnvironment" name\="MPJ_HOME" readOnly\="false" value\="/home/soumya/InstalledSoftwares/mpj-v0_38"/>\n<valueVariable description\="" name\="JAVA_HOME" readOnly\="false" value\="/home/soumya/Work/jdk1.7.0_25"/>\n</valueVariables>\n

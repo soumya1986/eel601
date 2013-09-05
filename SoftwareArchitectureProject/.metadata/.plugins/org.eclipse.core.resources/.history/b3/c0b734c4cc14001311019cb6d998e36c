@@ -1,0 +1,24 @@
+package multicore;
+
+public class MatrixMultiplicationNormal {
+	
+	private static int numOfRowsOrCols = 64;
+	
+	public static void main(int args[]){
+		
+	}
+	
+	private static int[][] create2DMatrix(){
+		int[][] matrix = new int[numOfRowsOrCols][numOfRowsOrCols];
+		
+		for (int row = 0; row < numOfRowsOrCols; row++) {
+            for (int col = 0; col < numOfRowsOrCols; col++) {
+            	matrix[row][col] = rand.nextInt(10);
+            }
+        }
+		
+		//display2DMatrix(matrix);
+		return matrix;
+	}
+
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/MulticoreDebuggerDemo"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="JAVA_HOME" value="${JAVA_HOME}"/>
+<mapEntry key="MPJ_HOME" value="${MPJ_HOME}"/>
+</mapAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="multicore.HelloWorld"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="MulticoreDebuggerDemo"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-jar ${MPJ_HOME}/lib/starter.jar"/>
+</launchConfiguration>

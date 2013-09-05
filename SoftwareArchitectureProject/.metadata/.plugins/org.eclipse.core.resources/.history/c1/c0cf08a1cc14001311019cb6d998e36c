@@ -1,0 +1,9 @@
+package multicore;
+
+public class MatrixMultiplicationNormal {
+	
+	public static void main(int args[]){
+		
+	}
+
+}

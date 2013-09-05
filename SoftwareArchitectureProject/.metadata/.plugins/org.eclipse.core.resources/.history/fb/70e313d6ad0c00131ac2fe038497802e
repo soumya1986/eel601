@@ -1,0 +1,147 @@
+package multicore;
+
+import mpi.*;
+
+public class SendFromMaster {
+	
+	public static void main(String[] args){
+		
+		MPI.Init(args); 
+		 
+		         int rank = MPI.COMM_WORLD.Rank() ; //The current process.
+		         int size = MPI.COMM_WORLD.Size() ; //Total number of processes
+		         int peer ; 
+		 
+		         
+		         int len = 2 ;
+		         int dataToBeSent = 99 ; 
+		         int tag = 100 ; 
+		 
+		         /*
+		         if(rank == 0) { 
+		        	 
+		        	 int buffer1 [] = new int[10]; 
+		 
+		             buffer1[0] = dataToBeSent ; 
+		             peer = 1 ; 
+		             MPI.COMM_WORLD.Send(buffer1, 0, len, MPI.INT, peer, tag) ; 
+		             System.out.println("process <"+rank+"> sent a msg to " +"process <"+peer+">") ; 
+		             
+		             Status status = MPI.COMM_WORLD.Recv(buffer1, 0, buffer1.length, MPI.INT, peer, tag); 
+		             System.out.println("process <"+rank+"> recv'ed a msg "+ "data <"+buffer1[0]
+		            		 +">"+" data <"+buffer1[1]
+		            		 +">"+"source <"+status.source+"> "
+		            		 +" tag <"+status.tag   +"> "
+		            		 +" count  <"+status.count +">\n") ; 
+		 
+		         } else if(rank == 1) { 
+		 
+		        	 int buffer2 [] = new int[10]; 
+		             peer = 0 ; 
+		             Status status = MPI.COMM_WORLD.Recv(buffer2, 0, buffer2.length, MPI.INT, peer, tag); 
+		             System.out.println("process <"+rank+"> recv'ed a msg "+ "data <"+buffer2[0]
+		            		 +">"+" source <"+status.source+"> "
+		            		 +" tag <"+status.tag   +"> "
+		            		 +" count  <"+status.count +">\n") ; 
+		             
+		             buffer2[1] = buffer2[0] + 1;
+		             MPI.COMM_WORLD.Send(buffer2, 0, len, MPI.INT, peer, tag) ; 
+		             System.out.println("process <"+rank+"> sent a msg to " +"process <"+peer+">") ; 
+		         } 
+		         */
+		         
+		         int rank0Tag = 100;
+		         int rank1Tag = 101;
+		         
+		         if(rank == 0) { 
+		        	 
+		        	 int buffer0 [] = new int[10]; 
+		             buffer0[0] = 500 ; 
+		             
+		             peer = 1 ; 
+		             MPI.COMM_WORLD.Isend(buffer0, 0, len, MPI.INT, peer, tag) ; 
+		             printMsg(rank, buffer0[0], peer, "sent", "to");
+		             
+		             peer = size -1 ; 
+		             MPI.COMM_WORLD.Isend(buffer0, 0, len, MPI.INT, peer, tag) ; 
+		             printMsg(rank, buffer0[0], peer, "sent", "to");
+		             
+		         }
+		         
+		         else if(rank == (size -1)) { 
+		        	 
+		        	 Status status;
+		        	 
+		        	 int buffer1 [] = new int[10]; 
+		        	 peer = 0;
+		        	 MPI.COMM_WORLD.Irecv(buffer1, 0, buffer1.length, MPI.INT, peer, tag); 
+		        	 printMsg(rank, buffer1[0], peer, "rcvd", "from");
+		             
+		             peer = (size -2);
+		             MPI.COMM_WORLD.Isend(buffer1, 0, len, MPI.INT, peer, tag) ; 
+		             printMsg(rank, buffer1[0], peer, "sent", "to");
+		         }
+		         
+		         else if(rank == (size/2)) { 
+		        	 
+		        	 Status status;
+		        	 
+		        	 int buffer2 [] = new int[10]; 
+		        	 peer = size/2-1;
+		        	 MPI.COMM_WORLD.Irecv(buffer2, 0, buffer2.length, MPI.INT, peer, tag); 
+		        	 printMsg(rank, buffer2[0], peer, "rcvd", "from");
+		         }
+		         
+		         else if(rank == (size/2 + 1)) { 
+		        	 
+		        	 Status status;
+		        	 
+		        	 int buffer3 [] = new int[10]; 
+		        	 peer = size/2+2;
+		        	 MPI.COMM_WORLD.Irecv(buffer3, 0, buffer3.length, MPI.INT, peer, tag); 
+		        	 printMsg(rank, buffer3[0], rank, "rcvd", "from");
+		         }
+		         
+		         else if((rank >= 1) && (rank <= (size/2 -1))) { 
+		        	 
+		        	 Status status;
+		        	 
+		        	 int buffer4 [] = new int[10]; 
+		        	 peer = rank - 1;
+		        	 MPI.COMM_WORLD.Irecv(buffer4, 0, buffer4.length, MPI.INT, peer, tag); 
+		        	 printMsg(rank, buffer4[0], peer, "rcvd", "from");
+		             
+		             peer = (rank + 1);
+		             MPI.COMM_WORLD.Isend(buffer4, 0, len, MPI.INT, peer, tag) ; 
+		             printMsg(rank, buffer4[0], peer, "sent", "to");
+		         }
+		         
+		         else{
+		        	 
+		        	 Status status;
+		        	 
+		        	 int buffer5 [] = new int[10]; 
+		        	 peer = rank + 1;
+		        	 MPI.COMM_WORLD.Irecv(buffer5, 0, buffer5.length, MPI.INT, peer, tag); 
+		        	 printMsg(rank, buffer5[0], peer, "rcvd", "from");
+		             
+		             peer = (rank - 1);
+		             MPI.COMM_WORLD.Isend(buffer5, 0, len, MPI.INT, peer, tag) ; 
+		             printMsg(rank, buffer5[0], peer, "sent", "to");
+		        	 
+		         }	
+		 
+		         MPI.Finalize(); 
+		 
+		     }  
+	
+			private static void printMsg(int rank, int msg, int peer, String state, String preposition){
+				System.out.println("process <"+rank+"> "+state+" a msg <"+msg+"> "+ preposition + " process <"+peer+">");
+			}
+			
+			
+		 
+		
+	}
+
+

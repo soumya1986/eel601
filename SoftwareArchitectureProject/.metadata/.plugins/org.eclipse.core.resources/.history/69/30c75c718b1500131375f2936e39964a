@@ -1,0 +1,11 @@
+package multicore;
+
+public class Matrix {
+	
+	int[][] array2D;
+	
+	public Matrix(int[][] array2D){
+		this.array2D = array2D;
+	}
+
+}

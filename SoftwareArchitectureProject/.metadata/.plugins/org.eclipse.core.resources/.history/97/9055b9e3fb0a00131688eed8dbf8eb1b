@@ -1,0 +1,9 @@
+package multicore;
+
+public class SendFromMaster {
+	
+	public static void main(String[] args){
+		
+	}
+
+}

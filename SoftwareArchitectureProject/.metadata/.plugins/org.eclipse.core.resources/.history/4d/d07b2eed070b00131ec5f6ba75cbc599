@@ -1,0 +1,49 @@
+package multicore;
+
+import mpi.*;
+
+public class SendFromMaster {
+	
+	public static void main(String[] args){
+		
+		MPI.Init(args); 
+		 
+		         int rank = MPI.COMM_WORLD.Rank() ; //The current process.
+		         int size = MPI.COMM_WORLD.Size() ; //Total number of processes
+		         int peer ; 
+		 
+		         int buffer [] = new int[10]; 
+		         int buffer2 [] = new int[10]; 
+		         int len = 2 ;
+		         int dataToBeSent = 99 ; 
+		         int tag = 100 ; 
+		 
+		         if(rank == 0) { 
+		 
+		             buffer[0] = dataToBeSent ; 
+		             peer = 1 ; 
+		             MPI.COMM_WORLD.Send(buffer, 0, len, MPI.INT, peer, tag) ; 
+		             System.out.println("process <"+rank+"> sent a msg to " +"process <"+peer+">") ; 
+		 
+		         } else if(rank == 1) { 
+		 
+		             peer = 0 ; 
+		             Status status = MPI.COMM_WORLD.Recv(buffer2, 0, buffer2.length, MPI.INT, peer, tag); 
+		             System.out.println("process <"+rank+"> recv'ed a msg "+ "data <"+buffer2[0]
+		            		 +">"+" source <"+status.source+"> "
+		            		 +" tag <"+status.tag   +"> "
+		            		 +" count  <"+status.count +">\n") ; 
+		             
+//		             buffer[1] = buffer[0] + 1;
+//		             MPI.COMM_WORLD.Send(buffer, 0, len, MPI.INT, peer, tag) ; 
+//		             System.out.println("process <"+rank+"> sent a msg to " +"process <"+peer+">") ; 
+		         } 
+		 
+		         MPI.Finalize(); 
+		 
+		     }  
+		 
+		
+	}
+
+

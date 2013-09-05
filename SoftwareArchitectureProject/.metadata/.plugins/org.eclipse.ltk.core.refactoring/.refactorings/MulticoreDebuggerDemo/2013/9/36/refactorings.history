@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;multicore.Array2D.java&apos; to &apos;Matrix.java&apos;&#x0A;- Original project: &apos;MulticoreDebuggerDemo&apos;&#x0A;- Original element: &apos;multicore.Array2D.java&apos;&#x0A;- Renamed element: &apos;multicore.Matrix.java&apos;" description="Rename compilation unit &apos;Array2D.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;multicore{Array2D.java" name="Matrix.java" references="false" stamp="1378315451968" version="1.0"/>
+</session>

@@ -1,0 +1,223 @@
+package multicore;
+
+
+import java.util.Random;
+
+import mpi.*;
+
+public class MatrixMultiplicationOnRing {
+	
+	private static int numOfRowsOrCols = 8;
+	private static int totalNumberOfElements;
+	
+	static Random rand = new Random();
+	
+	static int rank = 0; //The current process.
+    static int size = 0; //Total number of processes
+    static int peer = 0; 
+    static int tag = 100;
+    
+    static int myNumberOfElements; 
+    static int myNumberOfRows;
+    static int myElementsOfMatrixA[];
+    static int myElementsOfMatrixB[];
+    
+	
+	public static void main(String args[]){
+		
+		MPI.Init(args); 
+		int rank = MPI.COMM_WORLD.Rank() ; //The current process.
+        int size = MPI.COMM_WORLD.Size() ; //Total number of processes
+        
+        totalNumberOfElements = numOfRowsOrCols*numOfRowsOrCols;
+        myNumberOfRows = numOfRowsOrCols/size; // number of rows or cols to hold by each processor 
+        myNumberOfElements = numOfRowsOrCols*myNumberOfRows; // number of elements to hold from each matrix
+        myElementsOfMatrixA = new int[myNumberOfElements]; // each processor will hold a part of the matrix A
+        myElementsOfMatrixB = new int[myNumberOfElements]; // each processor will hold a part of the matrix B
+        
+        /*
+        if(rank == 100){
+        // create and display the matrix
+		int[][] array2d = create2DMatrix();
+		display2DMatrix(array2d);
+		int[] array1d = convertTo1Dfrom2D(array2d);
+		displayArray(array1d);
+		int[][] array2d_1 = convertTo2Dfrom1D(array1d);
+		display2DMatrix(array2d_1);
+		
+        }
+        */
+        
+        distributeFirstMatrix();
+	}
+	
+	private static void distributeFirstMatrix(){
+		if(rank == 0) { 
+        	 
+			 int[][] matrix_A = create2DMatrix();
+			 int[] matrix_A_1D = convertTo1Dfrom2D(matrix_A);
+			 
+			 getMyElementsOfMatrix(matrix_A_1D, rank);
+			 
+			 peer = 1;
+             MPI.COMM_WORLD.Ssend(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag) ; 
+             
+             peer = size -1 ; 
+             MPI.COMM_WORLD.Ssend(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag) ; 
+             
+         }
+         
+         else if(rank == (size -1)) { 
+        	 
+        	 Status status;
+        	 
+        	 int[] matrix_A_1D = new int[totalNumberOfElements]; 
+        	 peer = 0;
+        	 status = MPI.COMM_WORLD.Recv(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag); 
+        	 
+        	 getMyElementsOfMatrix(matrix_A_1D, rank);
+        	 
+             peer = (size -2);
+             MPI.COMM_WORLD.Ssend(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag) ; 
+         }
+         
+         else if(rank == (size/2)) { 
+        	 
+        	 Status status;
+        	 
+        	 int[] matrix_A_1D = new int[totalNumberOfElements]; 
+        	 peer = size/2-1;
+        	 status = MPI.COMM_WORLD.Recv(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag); 
+        	 
+        	 getMyElementsOfMatrix(matrix_A_1D, rank);
+        	 
+         }
+         
+         else if(rank == (size/2 + 1)) { 
+        	 
+        	 Status status;
+        	 
+        	 int[] matrix_A_1D = new int[totalNumberOfElements]; 
+        	 peer = size/2+2;
+        	 status = MPI.COMM_WORLD.Recv(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag); 
+        	 
+        	 getMyElementsOfMatrix(matrix_A_1D, rank);
+        	 
+         }
+         
+         else if((rank >= 1) && (rank <= (size/2 -1))) { 
+        	 
+        	 Status status;
+        	 
+        	 int[] matrix_A_1D = new int[totalNumberOfElements]; 
+        	 peer = rank - 1;
+        	 status = MPI.COMM_WORLD.Recv(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag); 
+        	 
+        	 getMyElementsOfMatrix(matrix_A_1D, rank);
+        	 
+             peer = (rank + 1);
+             MPI.COMM_WORLD.Ssend(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag) ; 
+             
+         }
+         
+         else{
+        	 
+        	 Status status;
+        	 
+        	 int[] matrix_A_1D = new int[totalNumberOfElements]; 
+        	 peer = rank + 1;
+        	 status = MPI.COMM_WORLD.Recv(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag); 
+        	 
+        	 getMyElementsOfMatrix(matrix_A_1D, rank);
+        	              
+             peer = (rank - 1);
+             MPI.COMM_WORLD.Ssend(matrix_A_1D, 0, totalNumberOfElements, MPI.INT, peer, tag) ; 
+        	 
+         }
+ 
+	}
+	
+	private static void getMyElementsOfMatrix(int[] matrix_1D, int rank){
+		for(int i=0 ; i<myNumberOfElements; i++){
+			 myElementsOfMatrixA[i] = matrix_1D[i + rank*myNumberOfElements];
+		 }
+		
+		System.out.println("Rank "+rank+" ");
+		for(int j=0 ; j<myNumberOfElements; j++){
+			System.out.print(myElementsOfMatrixA[j] + " , ");
+		}
+		
+		System.out.println();
+	}
+	
+	private static void displayArray(int[] array1d) {
+		
+		for(int i=0;i<(Math.pow(numOfRowsOrCols, 2));i++){
+			System.out.print(array1d[i]+" , ");
+		}
+		System.out.println("\n");
+		
+	}
+
+	private static int vectorMultiplication(int[] numArr1, int[] numArr2){
+		int sum = 0;
+		for(int i=0;i<numOfRowsOrCols;i++){
+			sum = sum + numArr1[i]*numArr2[i];
+		}
+		return sum;
+	}
+	
+	private static int[][] create2DMatrix(){
+		int[][] matrix = new int[numOfRowsOrCols][numOfRowsOrCols];
+		
+		for (int row = 0; row < numOfRowsOrCols; row++) {
+            for (int col = 0; col < numOfRowsOrCols; col++) {
+            	matrix[row][col] = rand.nextInt(10);
+            }
+        }
+		
+		//display2DMatrix(matrix);
+		return matrix;
+	}
+	
+	private static void display2DMatrix(int[][] matrix){
+		System.out.println("\n");
+		
+		for(int i = 0; i < matrix.length; i++) {
+				 
+            for(int j = 0; j < matrix[i].length; j++) {
+                     
+                System.out.print(matrix[i][j] + " ");
+                
+            }
+            System.out.println();
+        }
+		
+		System.out.println("\n");
+	}
+	
+	private static int[][] convertTo2Dfrom1D(int[] array1d){
+		int[][] array2d = new int[numOfRowsOrCols][numOfRowsOrCols];
+		for(int i=0, k=0; i<numOfRowsOrCols; i++){
+			for(int j=0; j<numOfRowsOrCols; j++){
+				array2d[i][j] = array1d[k++];
+			}
+		}
+		//display2DMatrix(array2d);
+		return array2d;
+	}
+	
+	private static int[] convertTo1Dfrom2D(int[][] array2d){
+		int[] array1d = new int[(int) Math.pow(numOfRowsOrCols, 2)];
+		for(int i=0, k=0; i<numOfRowsOrCols; i++){
+			for(int j=0; j<numOfRowsOrCols; j++){
+				//System.out.println(i+","+j+","+k);
+				array1d[k++] = array2d[i][j];
+			}
+		}
+		return array1d;
+	}
+
+}
+
+
